@@ -1,6 +1,6 @@
-const url = require('url');
 const http = require('http');
 const path = require('path');
+const fs = require("fs");
 
 const server = new http.Server();
 
@@ -10,14 +10,32 @@ server.on('request', (req, res) => {
 
   const filepath = path.join(__dirname, 'files', pathname);
 
+  const responseHandler = (code, message) => {
+    res.statusCode = code;
+    res.end(message);
+  }
+
   switch (req.method) {
     case 'DELETE':
+      if (pathname.includes('/')) {
+        responseHandler(400,'Nested paths not supported');
+        break;
+      }
+
+      fs.unlink(filepath,err => {
+        if (!err){
+          responseHandler(200,'OK')
+        } else if (err.code === 'ENOENT') {
+          responseHandler(404,'File not found');
+        } else {
+          responseHandler(500,'Internal server error');
+        }
+      })
 
       break;
 
     default:
-      res.statusCode = 501;
-      res.end('Not implemented');
+          responseHandler(501, 'Not implemented');
   }
 });
 

@@ -9,22 +9,23 @@ server.on('request', (req, res) => {
   const pathname = url.pathname.slice(1);
 
   const filepath = path.join(__dirname, 'files', pathname);
+  const responseHandler = (code, message) => {
+    res.statusCode = code;
+    res.end(message);
+  }
 
   switch (req.method) {
     case 'GET': {
       if (pathname.includes('/')) {
-        res.statusCode = 400
-        res.end('Nested paths not supported');
+        responseHandler(400,'Nested paths not supported');
       }
 
       const readStream = fs.createReadStream(filepath)
           .on('error', err => {
             if (err.code === 'ENOENT'){
-              res.statusCode = 404
-              res.end('File not found');
+              responseHandler(404,'File not found');
             } else{
-              res.statusCode = 500
-              res.end('Internal server error');
+              responseHandler(500,'Internal server error');
             }
           })
 
@@ -32,8 +33,7 @@ server.on('request', (req, res) => {
       break;
     }
     default:
-      res.statusCode = 501;
-      res.end('Not implemented');
+      responseHandler(501,'Not implemented');
   }
 });
 
