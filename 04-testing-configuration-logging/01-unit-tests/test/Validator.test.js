@@ -18,7 +18,7 @@ describe('testing-configuration-logging/unit-tests', () => {
 
     it('валидатор проверяет строковые поля (<min)', () => {
 
-      const errors = validator.validate({ name: 'Lalala', age: 18 });
+      const errors = validator.validate({ name: 'Lalala', age: 19 });
 
       expect(errors).to.have.length(1);
       expect(errors[0]).to.have.property('field').and.to.be.equal('name');
